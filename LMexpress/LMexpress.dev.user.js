@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Legend Express (newjackagario-hash dev)
 // @namespace    Legend Express Agario Mod - newjackagario-hash dev
-// @version      1.8.2.2
+// @version      1.8.2.3
 // @description  Agario Mod - Legend,Ogario,Kitty,Old Skins,Animated Skins,Language Packs,Manual User Scripts,Chat,60++ Macros/Hotkeys(Tricksplit,Doublesplit,Quick Feeding,Popsplit,Auto Coins,Freeze Cell Macro,Auto respawn)
 // @homepage     https://jimboy3100.github.io
 // @author       Jimboy3100
@@ -75,7 +75,8 @@ var legendPage = forkFileBase + 'play.html?t=' + cacheBust;
  */
 var forkScripts = [
     'ogario/ogario.v4.js',
-    'ogario/hotkeysCommand.js'
+    'ogario/hotkeysCommand.js',
+    'ogario/spect.js'
 ];
 var requestTimeoutMs = 30000;
 /* The /neo and /mobile add-on scripts run this long after the Legend page is written */
