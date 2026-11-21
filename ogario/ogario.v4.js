@@ -38446,6 +38446,10 @@ function thelegendmodproject() {
                         this.ghostCells.push({
                             'x': _ghostX,
                             'y': _ghostY,
+                            /* raw server coordinates: multibox units (spect.js) compare
+                             * their own ghost list with these to find their orientation */
+                            'rawX': d,
+                            'rawY': f,
                             'size': g,
                             'mass': m,
                             /* isInView compares with the (translated) view, so use translated coords */
@@ -38467,6 +38471,7 @@ function thelegendmodproject() {
                     } else {
                         window.legendmod.bgpi = 4;
                     }
+                    this.ghostCellsTime = Date.now();
                     break;
 
                 case 85:
@@ -68490,7 +68495,9 @@ function pickPlayerCellBySize(players, selectBiggest) {
                     var neededSpects = (defaultmapsettings.multiboxAmount || 2) - 1;
                     for (var sI = 0; sI < neededSpects; sI++) {
                         var sp = spects[sI];
-                        if (sp && sp.playerCellIDs && sp.playerCellIDs.length && sp.playerX != null && sp.playerX !== 0) {
+                        /* a unit whose offset/orientation isn't known yet has no place on this map */
+                        if (sp && sp.playerCellIDs && sp.playerCellIDs.length && sp.playerX != null && sp.playerX !== 0 &&
+                            !(typeof sp.transformReady === 'function' && !sp.transformReady())) {
                             /* playerX/Y are already client space incl. fix3 (spect getX). */
                             sumX += sp.playerX;
                             sumY += sp.playerY;
@@ -68504,7 +68511,8 @@ function pickPlayerCellBySize(players, selectBiggest) {
                 }
             } else if (window.multiboxPlayerEnabled && typeof spects !== "undefined" && spects && getActiveSpect(window.multiboxPlayerEnabled)) {
                 var spect = getActiveSpect(window.multiboxPlayerEnabled);
-                if (spect && spect.playerX != null && spect.playerX !== 0 && spect.playerCellIDs && spect.playerCellIDs.length) {
+                if (spect && spect.playerX != null && spect.playerX !== 0 && spect.playerCellIDs && spect.playerCellIDs.length &&
+                    !(typeof spect.transformReady === 'function' && !spect.transformReady())) {
                     targetCamX = spect.playerX;
                     targetCamY = spect.playerY;
                 }
