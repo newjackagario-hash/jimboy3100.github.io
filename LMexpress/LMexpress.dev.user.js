@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Legend Express (newjackagario-hash dev)
 // @namespace    Legend Express Agario Mod - newjackagario-hash dev
-// @version      1.8.2.1
+// @version      1.8.2.2
 // @description  Agario Mod - Legend,Ogario,Kitty,Old Skins,Animated Skins,Language Packs,Manual User Scripts,Chat,60++ Macros/Hotkeys(Tricksplit,Doublesplit,Quick Feeding,Popsplit,Auto Coins,Freeze Cell Macro,Auto respawn)
 // @homepage     https://jimboy3100.github.io
 // @author       Jimboy3100
@@ -32,7 +32,8 @@
  * Same as LMexpress.user.js, except that it installs and updates from the fork's
  * "dev" branch and loads play.html from there, so changes pushed to that branch can
  * be tried on agar.io before they go into a pull request. The scripts play.html
- * pulls in still come from jimboy3100.github.io.
+ * pulls in still come from jimboy3100.github.io, except the ones in forkScripts,
+ * which come from the same branch of the fork.
  *
  * Personal testing only: keep this file out of pull requests to jimboy3100, since
  * raw.githubusercontent.com would be a new @connect domain (CLAUDE.md rule 2).
@@ -62,8 +63,20 @@ var githubUser = 'newjackagario-hash';
 var githubRepo = 'jimboy3100.github.io';
 var githubBranch = 'dev';
 /* Timestamp so a just-pushed play.html isn't served from cache */
-var legendPage = 'https://raw.githubusercontent.com/' + githubUser + '/' + githubRepo + '/' +
-    githubBranch + '/play.html?t=' + Date.now();
+var cacheBust = Date.now();
+var forkFileBase = 'https://raw.githubusercontent.com/' + githubUser + '/' + githubRepo + '/' + githubBranch + '/';
+var legendPage = forkFileBase + 'play.html?t=' + cacheBust;
+/*
+ * Scripts taken from the fork instead of jimboy3100.github.io: play.html loads each
+ * from https://jimboy3100.github.io/<path>. raw.githubusercontent.com serves files as
+ * text/plain with nosniff, so the browser refuses them as <script src>. They are
+ * fetched here and written into the page inline, in the same place, so they still
+ * run in the same order. Add a path when the fork changes another script.
+ */
+var forkScripts = [
+    'ogario/ogario.v4.js',
+    'ogario/hotkeysCommand.js'
+];
 var requestTimeoutMs = 30000;
 /* The /neo and /mobile add-on scripts run this long after the Legend page is written */
 var extraScriptDelayMs = 5000;
@@ -161,9 +174,17 @@ function fetchText(url, onText, onFail) {
 /* Htmlscript: fetch an HTML page and write it over agar.io */
 function loadPage(pageUrl, isLegendPage, extraScriptUrl) {
     fetchText(pageUrl, function (html) {
-        if (isLegendPage) {
-            html = addInitCall(html);
+        if (!isLegendPage) {
+            writePage(html);
+            return;
         }
+        inlineForkScripts(addInitCall(html), writePage);
+    }, function (problem, err) {
+        console.error('[LMexpress] Could not load page ' + pageUrl + ' (' + problem + ')', err || '');
+        showLoadError(pageUrl, problem);
+    });
+
+    function writePage(html) {
         document.open();
         document.write(html);
         document.close();
@@ -172,9 +193,61 @@ function loadPage(pageUrl, isLegendPage, extraScriptUrl) {
                 runUserscript(extraScriptUrl, false);
             }, extraScriptDelayMs);
         }
-    }, function (problem, err) {
-        console.error('[LMexpress] Could not load page ' + pageUrl + ' (' + problem + ')', err || '');
-        showLoadError(pageUrl, problem);
+    }
+}
+
+/*
+ * Fetch the forkScripts from the fork and put each one inline in place of its
+ * <script src="https://jimboy3100.github.io/<path>"> tag. A script that can't be
+ * fetched or placed keeps jimboy3100.github.io's copy, with an error in the console.
+ */
+function inlineForkScripts(html, done) {
+    var codes = {};
+    var pending = forkScripts.length;
+    if (!pending) {
+        done(html);
+        return;
+    }
+    forkScripts.forEach(function (path) {
+        fetchText(forkFileBase + path + '?t=' + cacheBust, function (code) {
+            codes[path] = code;
+            finish();
+        }, function (problem, err) {
+            console.error('[LMexpress dev] Could not load the fork\'s ' + path + ' (' + problem + '); using jimboy3100.github.io\'s copy', err || '');
+            finish();
+        });
+    });
+
+    function finish() {
+        if (--pending > 0) return;
+        forkScripts.forEach(function (path) {
+            if (typeof codes[path] === 'string') {
+                html = inlineScript(html, path, codes[path]);
+            }
+        });
+        done(html);
+    }
+}
+
+function inlineScript(html, path, code) {
+    /* Inside an inline script "<!--" can change where the browser ends it. */
+    if (code.indexOf('<!--') !== -1) {
+        console.error('[LMexpress dev] The fork\'s ' + path + ' contains "<!--", so it can\'t be inlined; using jimboy3100.github.io\'s copy');
+        return html;
+    }
+    var tag = new RegExp('<script\\s+src="https://jimboy3100\\.github\\.io/' +
+        path.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&') + '"[^>]*>\\s*</script>', 'i');
+    if (!tag.test(html)) {
+        console.error('[LMexpress dev] play.html has no <script> tag for ' + path + '; the fork\'s copy is not used');
+        return html;
+    }
+    /* "</script" would end the inline script early; "<\/script" means the same in JS. */
+    var safe = code.replace(/<\/script/gi, '<\\/script');
+    console.info('[LMexpress dev] Using ' + path + ' from ' + githubUser + '/' + githubRepo + ' (' + githubBranch + ')');
+    /* A function, so "$&" or "$1" in the code is not read as a replacement pattern */
+    return html.replace(tag, function () {
+        return '<script>/* ' + path + ' from ' + githubUser + '/' + githubRepo + ' (' + githubBranch + ') */\n' +
+            safe + '\n</script>';
     });
 }
 
