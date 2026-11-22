@@ -22713,16 +22713,16 @@ function thelegendmodproject() {
                 //textLanguage.pause + '</div> <div id="leaderboard-hud" class="hud-b"><h5 class="hud-main-color">jimboy3100.github.io</h5><div id="leaderboard-data"></div><div id="leaderboard-positions"></div></div> <div id="btl-leaderboard-hud"><div class="hud hud-c"><span id="btl-players-status">Players ready</span>: <span id="btl-players-count">0</span></div></div> <div id="minimap-hud" class="hud-b"><canvas id="minimap-sectors"></canvas><canvas id="minimap"></canvas></div><div id="target-hud" class="hud"><div id="target-player"><span id="target-skin"><img src="https://www.legendmod.ml/banners/static/img/blank.png" alt=""> </span><span id="target-nick"></span><span id="target-status" class="hud-main-color">' + //class="hud-main-color">[' +
                 textLanguage.pause + '</div> <div id="leaderboard-hud" class="hud-b"><h5 class="hud-main-color">' + textLanguage.leaderboard + '</h5><div id="leaderboard-data"></div><div id="leaderboard-positions"></div></div> <div id="btl-leaderboard-hud"><div class="hud hud-c"></div></div> <div id="minimap-hud" class="hud-b"><canvas id="minimap-sectors"></canvas><canvas id="minimap"></canvas></div><div id="target-hud" class="hud"><div id="target-player"><span id="target-skin"><img src="https://www.legendmod.ml/banners/static/img/blank.png" alt=""> </span><span id="target-nick"></span><span id="target-status" class="hud-main-color">' + //class="hud-main-color">[' +
                 textLanguage.targetNotSet + '</span></div><div id="target-summary"></div></div><div id="target-panel-hud" class="hud">' +
-                '<a href="#" id="set-debug" class="ogicon-location"></a>' +
-                '<a href="#" id="set-fullSpectator" class="ogicon-eye"  style="display: none"></a>' +
-                '<a href="#" id="set-ingameSpectator" class="ogicon-power"  style="display: none"></a>' +
-                '<a href="#" id="fullscreenBtn" onclick="toggleFullScreen();"  class="ogicon-display"></a>' +
-                '<a href="#" id="RotateLeft" onclick="rotateminimapsectors();"  class="ogicon-loop2"></a>' +
-                '<a href="#" id="Bino" onclick="legendmod.sendFreeSpectate()"  class="ogicon-pacman"></a>' +
-                '<a href="#" id="set-targeting" class="ogicon-target"></a>' +
-                '<a href="#" id="set-private-minimap" class="ogicon-location2"></a>' +
-                '<a href="#" id="cancel-targeting" class="ogicon-cancel-circle"></a>' +
-                '<a href="#" id="change-target" class="ogicon-arrow-right"></a></div>' +
+                '<a href="#" id="set-debug" title="Debug: outline the view areas on the map (on/off)" class="ogicon-location"></a>' +
+                '<a href="#" id="set-fullSpectator" title="Full Spectator: see the whole map through extra spectator connections (on/off)" class="ogicon-eye"  style="display: none"></a>' +
+                '<a href="#" id="set-ingameSpectator" title="Ingame Spectator: extra spectator view while you play (on/off)" class="ogicon-power"  style="display: none"></a>' +
+                '<a href="#" id="fullscreenBtn" title="Full screen (on/off)" onclick="toggleFullScreen();"  class="ogicon-display"></a>' +
+                '<a href="#" id="RotateLeft" title="Rotate the minimap sectors" onclick="rotateminimapsectors();"  class="ogicon-loop2"></a>' +
+                '<a href="#" id="Bino" title="Free spectate: move the camera freely while spectating" onclick="legendmod.sendFreeSpectate()"  class="ogicon-pacman"></a>' +
+                '<a href="#" id="set-targeting" title="Targeting: start/stop following your target teammate" class="ogicon-target"></a>' +
+                '<a href="#" id="set-private-minimap" title="Show only your target on the minimap (on/off)" class="ogicon-location2"></a>' +
+                '<a href="#" id="cancel-targeting" title="Cancel target" class="ogicon-cancel-circle"></a>' +
+                '<a href="#" id="change-target" title="Change target: switch to the next teammate" class="ogicon-arrow-right"></a></div>' +
                 '<div id="quest-hud" class="hud"></div> <div id="btl-hud" class="hud"></div></div>');
             $('body').append('<ul id="messages"></ul>');
             /* LW: show debug/spectate buttons on legendmod.ml too */
